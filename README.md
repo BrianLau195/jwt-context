@@ -2,6 +2,8 @@
 
 A lightweight Express middleware for handling JWT authentication context.
 
+[![NPM Version][npm-version-image]][npm-url]
+
 ## Installation
 
 ```bash
@@ -73,3 +75,5 @@ declare global {
 ## License
 
 MIT
+
+[npm-url]: https://npmjs.org/package/jwt-context
