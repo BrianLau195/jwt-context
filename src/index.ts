@@ -1,6 +1,11 @@
 "use strict";
 
-import { Request, Response, NextFunction } from "express";
+import { Request, Response, NextFunction, RequestHandler } from "express";
+import {
+  JsonWebTokenError,
+  TokenExpiredError,
+  NotBeforeError,
+} from "jsonwebtoken";
 import jwt from "jsonwebtoken";
 
 interface JWTContext {
@@ -15,9 +20,8 @@ declare global {
   }
 }
 
-const jwtContext =
-  (jwtSecret: string) =>
-  (req: Request, res: Response, next: NextFunction): void => {
+export function jwtContext(jwtSecret: string): RequestHandler {
+  return (req: Request, res: Response, next: NextFunction): void => {
     const authHeader = req.headers.authorization;
 
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -30,11 +34,17 @@ const jwtContext =
     try {
       const decoded = jwt.verify(token, jwtSecret) as JWTContext;
       req.jwtContext = decoded;
-    } catch (err) {
+    } catch (err: unknown) {
+      if (
+        err instanceof JsonWebTokenError ||
+        err instanceof TokenExpiredError ||
+        err instanceof NotBeforeError
+      ) {
+        console.warn("JWT validation failed:", err.message);
+      }
       req.jwtContext = null;
     }
 
     next();
   };
-
-export { jwtContext };
+}

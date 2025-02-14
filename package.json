@@ -1,8 +1,12 @@
 {
   "name": "jwt-context",
   "description": "JWT Context Middleware for Express",
-  "version": "1.0.1",
-  "main": "index.js",
+  "version": "1.0.4",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "test": "jest",
     "test:watch": "jest --watch",

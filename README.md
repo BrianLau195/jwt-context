@@ -11,20 +11,20 @@ npm install jwt-context
 ## Usage
 
 ```typescript
-import express from 'express';
-import { jwtContext } from 'jwt-context';
+import express from "express";
+import { jwtContext } from "jwt-context";
 
 const app = express();
 
 // Initialize the middleware with your JWT secret
-app.use(jwtContext('your-jwt-secret'));
+app.use(jwtContext("your-jwt-secret"));
 
 // The JWT payload is now available in req.jwtContext
-app.get('/protected', (req, res) => {
+app.get("/protected", (req, res) => {
   if (!req.jwtContext) {
-    return res.status(401).json({ error: 'Unauthorized' });
+    return res.status(401).json({ error: "Unauthorized" });
   }
-  
+
   // Access the JWT payload
   const { userId, role } = req.jwtContext;
   res.json({ userId, role });
