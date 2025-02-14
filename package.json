@@ -29,5 +29,8 @@
     "prettier": "3.4.2",
     "ts-node": "^10.x.x",
     "typescript": "^5.x.x"
+  },
+  "publishConfig": {
+    "@BrianLau195:registry": "https://npm.pkg.github.com/"
   }
 }
