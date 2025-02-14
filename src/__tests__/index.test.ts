@@ -14,6 +14,11 @@ describe("jwtContext middleware", () => {
     };
     mockRes = {};
     nextFunction = jest.fn();
+    jest.spyOn(console, 'warn').mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
   });
 
   it("should set jwtContext to null when no authorization header is present", () => {
@@ -63,7 +68,7 @@ describe("jwtContext middleware", () => {
     expect(nextFunction).toHaveBeenCalled();
   });
 
-  it("should set jwtContext to null when JWT is signed with different secret", () => {
+  it("should set jwtContext to null and log warning when JWT is signed with different secret", () => {
     const token = jwt.sign({ userId: "123" }, "different-secret");
 
     mockReq.headers = {
@@ -75,5 +80,8 @@ describe("jwtContext middleware", () => {
 
     expect(mockReq.jwtContext).toBeNull();
     expect(nextFunction).toHaveBeenCalled();
+    expect(console.warn).toHaveBeenCalledWith(
+      expect.stringContaining("JWT validation failed: invalid signature")
+    );
   });
 });

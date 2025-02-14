@@ -40,7 +40,7 @@ export function jwtContext(jwtSecret: string): RequestHandler {
         err instanceof TokenExpiredError ||
         err instanceof NotBeforeError
       ) {
-        console.warn("JWT validation failed:", err.message);
+        console.warn("JWT validation failed: " + err.message);
       }
       req.jwtContext = null;
     }
