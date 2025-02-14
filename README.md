@@ -77,3 +77,4 @@ declare global {
 MIT
 
 [npm-url]: https://npmjs.org/package/jwt-context
+[npm-version-image]: https://badgen.net/npm/v/express
