@@ -9,7 +9,10 @@ import {
 import jwt from "jsonwebtoken";
 
 interface JWTContext {
-  [key: string]: any;
+  readonly [key: string]: unknown;
+  iat?: number;
+  exp?: number;
+  sub?: string;
 }
 
 declare global {
@@ -20,31 +23,62 @@ declare global {
   }
 }
 
-export function jwtContext(jwtSecret: string): RequestHandler {
-  return (req: Request, res: Response, next: NextFunction): void => {
-    const authHeader = req.headers.authorization;
+class JWTValidator {
+  private readonly jwtSecret: string;
+  private readonly options: jwt.VerifyOptions;
 
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      req.jwtContext = null;
-      return next();
+  constructor(jwtSecret: string, options: jwt.VerifyOptions = {}) {
+    if (!jwtSecret) {
+      throw new Error("JWT secret cannot be empty");
     }
+    this.jwtSecret = jwtSecret;
+    this.options = options;
+  }
 
-    const token = authHeader.split(" ")[1];
-
+  private validateToken(token: string): JWTContext | null {
     try {
-      const decoded = jwt.verify(token, jwtSecret) as JWTContext;
-      req.jwtContext = decoded;
-    } catch (err: unknown) {
+      return jwt.verify(token, this.jwtSecret, this.options) as JWTContext;
+    } catch (err) {
+      this.handleError(err);
+      return null;
+    }
+  }
+
+  private extractToken(authHeader: string | undefined): string | null {
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return null;
+    }
+    return authHeader.split(" ")[1];
+  }
+
+  private handleError(err: unknown): void {
+    if (err instanceof Error) {
       if (
         err instanceof JsonWebTokenError ||
         err instanceof TokenExpiredError ||
         err instanceof NotBeforeError
       ) {
-        console.warn("JWT validation failed: " + err.message);
+        console.warn(`JWT validation failed: ${err.message}`);
+      } else {
+        console.warn("Unknown JWT error occurred");
       }
-      req.jwtContext = null;
     }
+  }
 
-    next();
-  };
+  public middleware(): RequestHandler {
+    return (req: Request, res: Response, next: NextFunction): void => {
+      const token = this.extractToken(req.headers.authorization);
+      req.jwtContext = token ? this.validateToken(token) : null;
+      next();
+    };
+  }
+}
+
+export interface JWTValidatorOptions extends jwt.VerifyOptions {
+  secret: string;
+}
+
+export function jwtContext(options: JWTValidatorOptions): RequestHandler {
+  const validator = new JWTValidator(options.secret, options);
+  return validator.middleware();
 }
