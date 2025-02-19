@@ -1,7 +1,7 @@
 {
   "name": "jwt-context",
   "description": "JWT Context Middleware for Express",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
