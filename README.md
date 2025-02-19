@@ -101,5 +101,5 @@ Errors are logged with `console.warn` and the `req.jwtContext` will be set to `n
 
 MIT
 
-[npm-url]: https://npmjs.org/package/express-jwt-context
-[npm-version-image]: https://badgen.net/npm/v/express-jwt-context
+[npm-url]: https://npmjs.org/package/jwt-context
+[npm-version-image]: https://badgen.net/npm/v/jwt-context
